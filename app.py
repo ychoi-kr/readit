@@ -5,6 +5,22 @@ from PIL import Image
 import numpy as np
 import urllib
 
+# 언어 코드와 이름 매핑
+languages = {
+    "en": "English",
+    "ko": "한국어",
+    "ja": "日本語",
+    "fr": "Français",
+    "de": "Deutsch"
+    # 필요에 따라 추가 언어
+}
+
+# 언어 코드를 오름차순으로 정렬
+sorted_languages = sorted(languages.items())
+
+# 번역 대상 언어 선택 옵션
+language_options = [f"{code}({name})" for code, name in sorted_languages]
+
 
 # 색상 스펙트럼을 결정하는 함수
 def get_color(confidence):
@@ -30,12 +46,14 @@ st.set_page_config(page_title="OCR Web App", layout="wide")
 # 타이틀
 st.title("OCR Web App")
 
-# 언어 선택 (복수 선택 가능)
-language_options = ["en", "ja", "ko", "fr", "de"]  # 사용 가능한 언어 목록
-selected_languages = st.multiselect("언어 선택", language_options, default=["en", "ja"])
-
 # 이미지 업로드
 uploaded_file = st.file_uploader("이미지 업로드", type=["png", "jpg", "jpeg"])
+
+# 이미지에 있는 언어 선택
+selected_languages = st.multiselect("이미지에 있는 언어 선택:", language_options, default=["en(English)", "ja(日本語)"])
+
+# 사용자가 선택한 언어 코드 추출
+selected_language_codes = [lang.split("(")[0] for lang in selected_languages]
 
 # OCR 실행 버튼 및 정확도 임곗값 설정
 col1, col2 = st.columns([1, 4])
@@ -68,8 +86,12 @@ def display_ocr_results(image, result, threshold):
         if full_text:
             st.code(full_text)
 
+        # 한국어('ko')의 인덱스 찾기
+        default_index = next((i for i, option in enumerate(language_options) if option.startswith("ko")), 0)
+
         # 번역 대상 언어 선택 (기본값은 한국어 'ko')
-        target_language = st.selectbox("번역할 언어 선택:", ["en", "ko", "ja", "fr", "de"], index=1)
+        target_language_code = st.selectbox("번역할 언어 선택:", language_options, index=default_index)
+        target_language = target_language_code.split("(")[0]
 
         # 번역 링크 생성
         google_translate_url = f"https://translate.google.com/?sl=auto&tl={target_language}&text={urllib.parse.quote(full_text)}"
@@ -85,7 +107,7 @@ if uploaded_file is not None and 'ocr_clicked' in st.session_state and st.sessio
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
     # EasyOCR Reader
-    reader = easyocr.Reader(selected_languages)
+    reader = easyocr.Reader(selected_language_codes)
     result = reader.readtext(img)
     st.session_state['ocr_result'] = result
     st.session_state['original_image'] = img.copy()
