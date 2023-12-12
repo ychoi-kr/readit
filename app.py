@@ -68,11 +68,15 @@ def display_ocr_results(image, result, threshold):
         if full_text:
             st.code(full_text)
 
-        # 구글 번역 및 DeepL 링크
-        google_translate_url = f"https://translate.google.com/?sl=auto&tl=en&text={urllib.parse.quote(full_text)}"
-        deepl_translate_url = f"https://www.deepl.com/translator#auto/en/{urllib.parse.quote(full_text)}"
+        # 번역 대상 언어 선택 (기본값은 한국어 'ko')
+        target_language = st.selectbox("번역할 언어 선택:", ["en", "ko", "ja", "fr", "de"], index=1)
 
-        st.markdown(f"[Google 번역]({google_translate_url}) | [DeepL 번역]({deepl_translate_url})", unsafe_allow_html=True)
+        # 번역 링크 생성
+        google_translate_url = f"https://translate.google.com/?sl=auto&tl={target_language}&text={urllib.parse.quote(full_text)}"
+        deepl_translate_url = f"https://www.deepl.com/translator#auto/{target_language}/{urllib.parse.quote(full_text)}"
+        papago_translate_url = f"https://papago.naver.com/?sk=auto&tk={target_language}&st={urllib.parse.quote(full_text)}"
+
+        st.markdown(f"[Google 번역]({google_translate_url}) | [DeepL]({deepl_translate_url}) | [Papago]({papago_translate_url})", unsafe_allow_html=True)
 
 if uploaded_file is not None and 'ocr_clicked' in st.session_state and st.session_state['ocr_clicked']:
     # 이미지를 OpenCV 형식으로 변환
