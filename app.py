@@ -4,6 +4,15 @@ import cv2
 from PIL import Image
 import numpy as np
 
+# 색상 스펙트럼을 결정하는 함수
+def get_color(confidence):
+    if confidence > 0.8:
+        return (0, 255, 0)  # 녹색
+    elif confidence > 0.5:
+        return (255, 255, 0)  # 노란색
+    else:
+        return (255, 0, 0)  # 빨간색
+
 # Streamlit 페이지 설정
 st.set_page_config(page_title="OCR Web App", layout="wide")
 
@@ -33,7 +42,7 @@ def display_ocr_results(image, result, threshold):
             if conf > threshold:
                 top_left = tuple([int(val) for val in bbox[0]])
                 bottom_right = tuple([int(val) for val in bbox[2]])
-                color = (0, 255, 0) if conf > 0.8 else (255, 0, 0)
+                color = get_color(conf)
                 image = cv2.rectangle(image, top_left, bottom_right, color, 2)
         st.image(image, caption='Processed Image', use_column_width=True)
 
