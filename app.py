@@ -8,11 +8,25 @@ import urllib
 # 언어 코드와 이름 매핑
 languages = {
     "en": "English",
-    "ko": "한국어",
-    "ja": "日本語",
+    "es": "Español",
+    "zh": "中文",
+    "ar": "العربية",
+    "bn": "বাংলা",
     "fr": "Français",
-    "de": "Deutsch"
-    # 필요에 따라 추가 언어
+    "de": "Deutsch",
+    "hi": "हिन्दी",
+    "id": "Bahasa Indonesia",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "ms": "Bahasa Melayu",
+    "fa": "فارسی",
+    "pl": "Polski",
+    "pt": "Português",
+    "ru": "Русский",
+    "th": "ไทย",
+    "tr": "Türkçe",
+    "vi": "Tiếng Việt"
 }
 
 # 언어 코드를 오름차순으로 정렬
