@@ -6,12 +6,21 @@ import numpy as np
 
 # 색상 스펙트럼을 결정하는 함수
 def get_color(confidence):
-    if confidence > 0.8:
-        return (0, 255, 0)  # 녹색
-    elif confidence > 0.5:
-        return (255, 255, 0)  # 노란색
-    else:
-        return (255, 0, 0)  # 빨간색
+    match confidence:
+        case _ if confidence > 0.9:
+            return (0, 255, 0)  # 밝은 녹색
+        case _ if confidence > 0.8:
+            return (100, 255, 100)  # 중간 녹색
+        case _ if confidence > 0.7:
+            return (255, 255, 0)  # 밝은 노란색
+        case _ if confidence > 0.6:
+            return (255, 200, 0)  # 중간 노란색
+        case _ if confidence > 0.5:
+            return (255, 150, 0)  # 어두운 노란색
+        case _:
+            # 신뢰도가 낮을수록 빨간색이 진해짐
+            red_intensity = int(255 * confidence)  
+            return (255, red_intensity, red_intensity)
 
 # Streamlit 페이지 설정
 st.set_page_config(page_title="OCR Web App", layout="wide")
