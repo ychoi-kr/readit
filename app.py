@@ -3,6 +3,8 @@ import easyocr
 import cv2
 from PIL import Image
 import numpy as np
+import urllib
+
 
 # 색상 스펙트럼을 결정하는 함수
 def get_color(confidence):
@@ -57,9 +59,20 @@ def display_ocr_results(image, result, threshold):
 
     with col2:
         st.write("OCR 결과:")
+        full_text = ""
         for bbox, text, conf in result:
             if conf > threshold:
-                st.write(text)
+                full_text += text + "\n"
+
+        # OCR 결과를 코드 블록으로 표시(복사하기 편리하도록)
+        if full_text:
+            st.code(full_text)
+
+        # 구글 번역 및 DeepL 링크
+        google_translate_url = f"https://translate.google.com/?sl=auto&tl=en&text={urllib.parse.quote(full_text)}"
+        deepl_translate_url = f"https://www.deepl.com/translator#auto/en/{urllib.parse.quote(full_text)}"
+
+        st.markdown(f"[Google 번역]({google_translate_url}) | [DeepL 번역]({deepl_translate_url})", unsafe_allow_html=True)
 
 if uploaded_file is not None and 'ocr_clicked' in st.session_state and st.session_state['ocr_clicked']:
     # 이미지를 OpenCV 형식으로 변환
