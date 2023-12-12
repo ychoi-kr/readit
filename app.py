@@ -55,16 +55,16 @@ def get_color(confidence):
             return (255, red_intensity, red_intensity)
 
 # Streamlit 페이지 설정
-st.set_page_config(page_title="OCR Web App", layout="wide")
+st.set_page_config(page_title="Read it! OCR", layout="wide")
 
 # 타이틀
-st.title("OCR Web App")
+st.title("Read it! OCR")
 
 # 이미지 업로드
-uploaded_file = st.file_uploader("이미지 업로드", type=["png", "jpg", "jpeg"])
+uploaded_file = st.file_uploader("Upload image:", type=["png", "jpg", "jpeg"])
 
 # 이미지에 있는 언어 선택
-selected_languages = st.multiselect("이미지에 있는 언어 선택:", language_options, default=["en(English)", "ja(日本語)"])
+selected_languages = st.multiselect("Language(s) in image:", language_options, default=["en(English)", "ko(한국어)"])
 
 # 사용자가 선택한 언어 코드 추출
 selected_language_codes = [lang.split("(")[0] for lang in selected_languages]
@@ -72,10 +72,15 @@ selected_language_codes = [lang.split("(")[0] for lang in selected_languages]
 # OCR 실행 버튼 및 정확도 임곗값 설정
 col1, col2 = st.columns([1, 4])
 with col1:
-    if st.button("OCR 실행"):
+    if st.button("Read it!"):
         st.session_state['ocr_clicked'] = True
 with col2:
-    threshold = st.slider("정확도 임곗값 설정", 0.0, 1.0, 0.5, key='threshold_slider')
+    threshold = st.slider(
+        "Confidence Threshold", 
+        0.0, 1.0, 0.5, 
+        key='threshold_slider',
+        help="Set the minimum confidence level for OCR results to be displayed. Move the slider to filter out less confident results."
+    )
 
 # OCR 처리 및 결과 표시
 def display_ocr_results(image, result, threshold):
@@ -90,7 +95,7 @@ def display_ocr_results(image, result, threshold):
         st.image(image, caption='Processed Image', use_column_width=True)
 
     with col2:
-        st.write("OCR 결과:")
+        st.write("Text in image:")
         full_text = ""
         for bbox, text, conf in result:
             if conf > threshold:
@@ -104,7 +109,7 @@ def display_ocr_results(image, result, threshold):
         default_index = next((i for i, option in enumerate(language_options) if option.startswith("ko")), 0)
 
         # 번역 대상 언어 선택 (기본값은 한국어 'ko')
-        target_language_code = st.selectbox("번역할 언어 선택:", language_options, index=default_index)
+        target_language_code = st.selectbox("Target language:", language_options, index=default_index)
         target_language = target_language_code.split("(")[0]
 
         # 번역 링크 생성
@@ -112,7 +117,7 @@ def display_ocr_results(image, result, threshold):
         deepl_translate_url = f"https://www.deepl.com/translator#auto/{target_language}/{urllib.parse.quote(full_text)}"
         papago_translate_url = f"https://papago.naver.com/?sk=auto&tk={target_language}&st={urllib.parse.quote(full_text)}"
 
-        st.markdown(f"[Google 번역]({google_translate_url}) | [DeepL]({deepl_translate_url}) | [Papago]({papago_translate_url})", unsafe_allow_html=True)
+        st.markdown(f"[Google Translate]({google_translate_url}) | [DeepL]({deepl_translate_url}) | [Papago]({papago_translate_url})", unsafe_allow_html=True)
 
 if uploaded_file is not None and 'ocr_clicked' in st.session_state and st.session_state['ocr_clicked']:
     # 이미지를 OpenCV 형식으로 변환
